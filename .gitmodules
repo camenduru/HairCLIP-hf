@@ -1,0 +1,6 @@
+[submodule "HairCLIP"]
+	path = HairCLIP
+	url = https://github.com/wty-ustc/HairCLIP
+[submodule "encoder4editing"]
+	path = encoder4editing
+	url = https://github.com/omertov/encoder4editing
