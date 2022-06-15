@@ -10,8 +10,10 @@ import subprocess
 import gradio as gr
 
 if os.getenv('SYSTEM') == 'spaces':
-    subprocess.call('git apply ../patch.e4e'.split(), cwd='encoder4editing')
-    subprocess.call('git apply ../patch.hairclip'.split(), cwd='HairCLIP')
+    with open('patch.e4e') as f:
+        subprocess.call('patch -p1'.split(), cwd='encoder4editing', stdin=f)
+    with open('patch.hairclip') as f:
+        subprocess.call('patch -p1'.split(), cwd='HairCLIP', stdin=f)
 
 from model import Model
 
