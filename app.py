@@ -11,9 +11,9 @@ import gradio as gr
 
 if os.getenv('SYSTEM') == 'spaces':
     with open('patch.e4e') as f:
-        subprocess.call('patch -p1'.split(), cwd='encoder4editing', stdin=f)
+        subprocess.run('patch -p1'.split(), cwd='encoder4editing', stdin=f)
     with open('patch.hairclip') as f:
-        subprocess.call('patch -p1'.split(), cwd='HairCLIP', stdin=f)
+        subprocess.run('patch -p1'.split(), cwd='HairCLIP', stdin=f)
 
 from model import Model
 
