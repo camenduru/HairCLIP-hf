@@ -24,7 +24,7 @@ sys.path.insert(0, 'HairCLIP/mapper/')
 from mapper.datasets.latents_dataset_inference import LatentsDatasetInference
 from mapper.hairclip_mapper import HairCLIPMapper
 
-TOKEN = os.environ['TOKEN']
+HF_TOKEN = os.environ['HF_TOKEN']
 
 
 class Model:
@@ -40,13 +40,13 @@ class Model:
         path = huggingface_hub.hf_hub_download(
             'hysts/dlib_face_landmark_model',
             'shape_predictor_68_face_landmarks.dat',
-            use_auth_token=TOKEN)
+            use_auth_token=HF_TOKEN)
         return dlib.shape_predictor(path)
 
     def _load_e4e(self) -> nn.Module:
         ckpt_path = huggingface_hub.hf_hub_download('hysts/e4e',
                                                     'e4e_ffhq_encode.pt',
-                                                    use_auth_token=TOKEN)
+                                                    use_auth_token=HF_TOKEN)
         ckpt = torch.load(ckpt_path, map_location='cpu')
         opts = ckpt['opts']
         opts['device'] = self.device.type
@@ -60,7 +60,7 @@ class Model:
     def _load_hairclip(self) -> nn.Module:
         ckpt_path = huggingface_hub.hf_hub_download('hysts/HairCLIP',
                                                     'hairclip.pt',
-                                                    use_auth_token=TOKEN)
+                                                    use_auth_token=HF_TOKEN)
         ckpt = torch.load(ckpt_path, map_location='cpu')
         opts = ckpt['opts']
         opts['device'] = self.device.type
