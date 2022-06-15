@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import argparse
 import os
+import pathlib
+import subprocess
 import sys
 from typing import Callable, Union
 
@@ -13,13 +15,24 @@ import torch
 import torch.nn as nn
 import torchvision.transforms as T
 
-sys.path.insert(0, 'encoder4editing')
+if os.getenv('SYSTEM') == 'spaces':
+    with open('patch.e4e') as f:
+        subprocess.run('patch -p1'.split(), cwd='encoder4editing', stdin=f)
+    with open('patch.hairclip') as f:
+        subprocess.run('patch -p1'.split(), cwd='HairCLIP', stdin=f)
+
+app_dir = pathlib.Path(__file__).parent
+
+e4e_dir = app_dir / 'encoder4editing'
+sys.path.insert(0, e4e_dir.as_posix())
 
 from models.psp import pSp
 from utils.alignment import align_face
 
-sys.path.insert(0, 'HairCLIP/')
-sys.path.insert(0, 'HairCLIP/mapper/')
+hairclip_dir = app_dir / 'HairCLIP'
+mapper_dir = hairclip_dir / 'mapper'
+sys.path.insert(0, hairclip_dir.as_posix())
+sys.path.insert(0, mapper_dir.as_posix())
 
 from mapper.datasets.latents_dataset_inference import LatentsDatasetInference
 from mapper.hairclip_mapper import HairCLIPMapper

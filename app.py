@@ -3,17 +3,9 @@
 from __future__ import annotations
 
 import argparse
-import os
 import pathlib
-import subprocess
 
 import gradio as gr
-
-if os.getenv('SYSTEM') == 'spaces':
-    with open('patch.e4e') as f:
-        subprocess.run('patch -p1'.split(), cwd='encoder4editing', stdin=f)
-    with open('patch.hairclip') as f:
-        subprocess.run('patch -p1'.split(), cwd='HairCLIP', stdin=f)
 
 from model import Model
 
