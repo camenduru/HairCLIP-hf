@@ -1,0 +1,8 @@
+h1 {
+  text-align: center;
+}
+
+img#teaser {
+  max-width: 1000px;
+  max-height: 600px;
+}

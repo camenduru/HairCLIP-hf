@@ -15,7 +15,7 @@ import torch
 import torch.nn as nn
 import torchvision.transforms as T
 
-if os.getenv('SYSTEM') == 'spaces':
+if os.getenv('SYSTEM') == 'spaces' and not torch.cuda.is_available():
     with open('patch.e4e') as f:
         subprocess.run('patch -p1'.split(), cwd='encoder4editing', stdin=f)
     with open('patch.hairclip') as f:
@@ -37,12 +37,11 @@ sys.path.insert(0, mapper_dir.as_posix())
 from mapper.datasets.latents_dataset_inference import LatentsDatasetInference
 from mapper.hairclip_mapper import HairCLIPMapper
 
-HF_TOKEN = os.environ['HF_TOKEN']
-
 
 class Model:
-    def __init__(self, device: Union[torch.device, str]):
-        self.device = torch.device(device)
+    def __init__(self):
+        self.device = torch.device(
+            'cuda:0' if torch.cuda.is_available() else 'cpu')
         self.landmark_model = self._create_dlib_landmark_model()
         self.e4e = self._load_e4e()
         self.hairclip = self._load_hairclip()
@@ -51,15 +50,13 @@ class Model:
     @staticmethod
     def _create_dlib_landmark_model():
         path = huggingface_hub.hf_hub_download(
-            'hysts/dlib_face_landmark_model',
-            'shape_predictor_68_face_landmarks.dat',
-            use_auth_token=HF_TOKEN)
+            'public-data/dlib_face_landmark_model',
+            'shape_predictor_68_face_landmarks.dat')
         return dlib.shape_predictor(path)
 
     def _load_e4e(self) -> nn.Module:
-        ckpt_path = huggingface_hub.hf_hub_download('hysts/e4e',
-                                                    'e4e_ffhq_encode.pt',
-                                                    use_auth_token=HF_TOKEN)
+        ckpt_path = huggingface_hub.hf_hub_download('public-data/e4e',
+                                                    'e4e_ffhq_encode.pt')
         ckpt = torch.load(ckpt_path, map_location='cpu')
         opts = ckpt['opts']
         opts['device'] = self.device.type
@@ -71,9 +68,8 @@ class Model:
         return model
 
     def _load_hairclip(self) -> nn.Module:
-        ckpt_path = huggingface_hub.hf_hub_download('hysts/HairCLIP',
-                                                    'hairclip.pt',
-                                                    use_auth_token=HF_TOKEN)
+        ckpt_path = huggingface_hub.hf_hub_download('public-data/HairCLIP',
+                                                    'hairclip.pt')
         ckpt = torch.load(ckpt_path, map_location='cpu')
         opts = ckpt['opts']
         opts['device'] = self.device.type
@@ -98,8 +94,8 @@ class Model:
         ])
         return transform
 
-    def detect_and_align_face(self, image) -> PIL.Image.Image:
-        image = align_face(filepath=image.name, predictor=self.landmark_model)
+    def detect_and_align_face(self, image: str) -> PIL.Image.Image:
+        image = align_face(filepath=image, predictor=self.landmark_model)
         return image
 
     @staticmethod
